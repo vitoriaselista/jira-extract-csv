@@ -220,6 +220,46 @@ def get_global_permissions():
 
     print(f"Data saved to {csv_file_name}")
 
+def get_workflows():
+    url = base_url + "/rest/api/3/workflow/search"
+    max_results = 1000  # Set the total number of results you want
+    results = []
+    start_at = 0  # Initialize the starting point for pagination
+
+    while len(results) < max_results:
+        response = get(url, params={'maxResults': 100, 'startAt': start_at}).json()
+
+        workflows = response['values']
+
+        if not workflows:
+            # No more results to retrieve
+            break
+
+        results.extend(workflows)
+        start_at += len(workflows)
+
+    # Define the CSV file name and open it for writing.
+    csv_file_name = f"{instance_name}-workflows.csv"
+    with open(csv_file_name, mode='w', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file)
+
+        # Write the header row to the CSV file.
+        header = ['Id', 'Name', 'Description', 'Created', 'Updated']
+        csv_writer.writerow(header)
+
+        # Iterate through the permissions and write their data to the CSV file.
+        for workflow in results:
+            entity_id = workflow.get('id', {}).get('entityId', '')
+            name = workflow.get('id', {}).get('name', '')
+            description = workflow.get('description', '')
+            created = workflow.get('created', '')
+            updated = workflow.get('updated', '')
+
+            row = [entity_id, name, description, created, updated]
+            csv_writer.writerow(row)
+
+    print(f"Data saved to {csv_file_name}")
+
 # Execute the functions from the command line
 import sys
 
@@ -237,6 +277,8 @@ if __name__ == "__main__":
             get_resolutions()
         elif function_name == "get_global_permissions":
             get_global_permissions()
+        elif function_name == "get_workflows":
+            get_workflows()
         else:
             print(
                 "Invalid function name. Available functions: get_filters, get_fields, get_resolutions, get_global_permissions")
