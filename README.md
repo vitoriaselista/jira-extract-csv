@@ -18,11 +18,12 @@ bash
 
     python script_name.py get_filters
 
-    Available functions:
-        get_filters: Retrieves Jira filters and saves them to a CSV file.
-        get_fields: Retrieves Jira fields and saves them to a CSV file.
-        get_resolutions: Retrieves Jira resolutions and saves them to a CSV file.
-        get_global_permissions: Retrieves Jira global permissions and saves them to a CSV file.
+    Available functions (all data retrieved is saved into a CSV file):
+        get_filters: Retrieves all filters.
+        get_fields: Retrieves all fields and info.
+        get_resolutions: Retrieves Jira resolutions.
+        get_global_permissions: Retrieves Jira global permissions.
+        get_workflows: Retrieves basic info about workflows.
 
 **Note:** Ensure that you have proper permission to access the specified Jira Cloud instance.
 
