@@ -200,7 +200,7 @@ def get_global_permissions():
         start_at += len(permissions)
 
     # Define the CSV file name and open it for writing.
-    csv_file_name = "permissions.csv"
+    csv_file_name = f"{instance_name}-permissions.csv"
     with open(csv_file_name, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
 
