@@ -5,6 +5,7 @@ import csv
 import codecs
 import json
 from config import credentials, base_url
+import sys
 
 # Split the URL by "\\" to separate the parts.
 instance_name = base_url.split("//")[1].split(".")[0]
@@ -260,9 +261,49 @@ def get_workflows():
 
     print(f"Data saved to {csv_file_name}")
 
-# Execute the functions from the command line
-import sys
+def get_group_users():
+    group_id = input('Inform the group Id \n > ')
+    url = base_url + f"/rest/api/2/group/member?groupId={group_id}"
+    max_results = 1000  # Set the total number of results you want
+    results = []
+    start_at = 0  # Initialize the starting point for pagination
 
+    while len(results) < max_results:
+        response = get(url, params={'maxResults': 100, 'startAt': start_at}).json()
+
+        users = response['values']
+
+        if not users:
+            # No more results to retrieve
+            break
+
+        results.extend(users)
+        start_at += len(users)
+
+    # Define the CSV file name and open it for writing.
+    csv_file_name = f"{instance_name}-{group_id}-users.csv"
+    with open(csv_file_name, mode='w', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file)
+
+        # Write the header row to the CSV file.
+        header = ['self', 'accountId', 'displayName', 'active', 'accountType', 'emailAddress']
+        csv_writer.writerow(header)
+
+        # Iterate through the permissions and write their data to the CSV file.
+        for user in results:
+            self = user.get('self','')
+            accountId = user.get('accountId', '')
+            displayName = user.get('displayName', '')
+            active = user.get('active', '')
+            accountType = user.get('accountType', '')
+            emailAddress = user.get('emailAddress', '')
+
+            row = [self, accountId, displayName, active, accountType, emailAddress]
+            csv_writer.writerow(row)
+
+    print(f"Data saved to {csv_file_name}")
+
+# Execute the functions from the command line
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Please provide a function name as an argument.")
@@ -279,7 +320,10 @@ if __name__ == "__main__":
             get_global_permissions()
         elif function_name == "get_workflows":
             get_workflows()
+        elif function_name == "get_group_users":
+            get_group_users()
         else:
             print(
                 "Invalid function name. Available functions: get_filters, get_fields, get_resolutions, get_global_permissions")
+
 
